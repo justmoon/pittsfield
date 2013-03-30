@@ -1,0 +1,91 @@
+This is the latest release of PittSFIeld, a tool for sandboxing
+arbitrary x86 binary programs.
+
+Sandboxing, also known as software-based fault isolation (SFI), is a
+technique to enforce security policies constraining memory access and
+control flow in untrusted binary code. It directly modifies software
+at the instruction level to efficiently check that memory addresses
+and jump targets lie only in designated safe data and code regions.
+More information about PittSFIeld, including academic papers
+describing its approach in detail, can be found at the project web
+site, at:
+
+http://people.csail.mit.edu/smcc/projects/pittsfield/
+
+This distribution includes the rewriting and verification tools (Perl
+scripts rewrite.pl and verify.pl), as well as an example application
+consisting of a program to load fault-isolated object files (loader.c)
+and an implementation of parts of the C standard library (libc.[ch])
+in which some routines are rewritten and linked with the sandboxed
+code (and so untrusted), and others make calls out of the sandbox to
+trusted stubs.
+
+Required software:
+GCC (most recently tested with version 4.4.5)
+GNU binutils (most recently tested with version 2.20.1)
+Perl (most recently tested with version 5.10.1)
+libelf (most recently tested with version 0.8.13)
+
+Previous versions have worked with tools as old as GCC 3.3.5, binutils
+2.15, Perl 5.8.4, and libelf 0.8.5, and no major incompatible changes
+have been made, so any version in those ranges will probably work with
+little effort.
+
+This version also includes a second implementation of the verifier
+that runs in C inside the loader. It requires the libdisasm x86
+disassembly library, which is available from
+
+http://bastard.sourceforge.net/libdisasm.html
+
+The code in this release was last tested with libdisasm 0.23, which is
+slightly incompatible with the version used by earlier PittSFIeld
+versions.
+
+There is not yet any documentation, sorry. The top-level tool is the
+"pittsfield-gcc.pl" script, which acts as a substitute C compiler: use
+it with the "-c" option to each ".c" file of your program into a ".o"
+file, and then with a list of all the ".o" files to create either a
+".fio" file (representing a complete sandboxed object, including the
+stub C library) or a compiled copy of the loader with the path to a
+.fio file hard-coded.
+
+Running "make" in this directory will compile the loader and two
+"Hello, world!" sandboxed modules, one using the C library and one
+using the C++ library. To run them, say:
+
+./loader-classic hw.fio
+./loader-classic hw-c++.fio
+
+By default, the Makefile compiles modules with the "classic" memory
+layout, with 16MB code and data regions. Two other layouts, "medium"
+and "large", are also supported; to use them, use the SIZE Makefile
+option and the corresponding loader binary:
+
+make clean
+make SIZE=large hw.fio loader-large
+./loader-large hw.fio
+
+Note that this is still a research prototype: neither of the supplied
+verifiers has yet been sufficiently reviewed to recommend the use of
+PittSFIeld in security-critical production environments. Though the
+two verifiers have been cross-checked and a number of problems have
+been fixed, they were written by the same developer, and it is likely
+that additional problems exist. Also, there are some known gaps in the
+checking performed by the load-time verifier: it treats all x87
+floating-point instructions as equivalent, and it allows modification
+of segment registers and use of non-standard segments.
+
+PittSFIeld is Copyright (C) 2004-2006,2008-2010, Stephen McCamant.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2, as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA
