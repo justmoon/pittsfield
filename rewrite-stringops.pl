@@ -15,6 +15,11 @@ while (<>) {
 	    chomp $stringop;
 	    $stringop =~ s/^\t//;
 	}
+        if ($stringop eq "ret") {
+            # rep ret
+            print "\tret\n";
+            next;
+        }
 	my $head_label = ".LRWSOPS$label_count"; $label_count++;
 	my $tail_label = ".LRWSOPS$label_count"; $label_count++;
 	my $save_eax = ($stringop !~ /^stos/);

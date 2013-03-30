@@ -34,13 +34,13 @@ CFLAGS := $(DEBUG) $(OPT) $(SIZE_DEFINE)
 all: loader-large loader-medium loader-classic hw.fio hw-c++.fio
 
 loader-large:	loader.c wrappers.h sizes.h high-link.x
-	$(CC) -O2 -Wall $(VERIFY_CFLAGS) -DSFI_LARGE -g -static loader.c $(VERIFY_LDFLAGS) -lelf -lm -Wl,-T -Wl,high-link.x -o $@
+	$(CC) -O2 -Wall $(VERIFY_CFLAGS) -DSFI_LARGE -g -static loader.c $(VERIFY_LDFLAGS) -m32 -pthread -lelf -lm -Wl,-T -Wl,high-link.x -o $@
 
 loader-medium:	loader.c wrappers.h sizes.h
-	$(CC) -O2 -Wall $(VERIFY_CFLAGS) -DSFI_MEDIUM -g loader.c $(VERIFY_LDFLAGS) -lelf -lm -o $@
+	$(CC) -O2 -Wall $(VERIFY_CFLAGS) -DSFI_MEDIUM -g loader.c $(VERIFY_LDFLAGS) -m32 -pthread -lelf -lm -o $@
 
 loader-classic:	loader.c wrappers.h sizes.h high-link.x
-	$(CC) -O2 -Wall $(VERIFY_CFLAGS) -DSFI_CLASSIC -g loader.c $(VERIFY_LDFLAGS) -lelf -lm -o $@
+	$(CC) -O2 -Wall $(VERIFY_CFLAGS) -DSFI_CLASSIC -g loader.c $(VERIFY_LDFLAGS) -m32 -pthread -lelf -lm -o $@
 
 clean:
 	rm -f *.o *.s *.fis *.fio *.mo *-raw *-noebx *-pad *.check *-mod.out

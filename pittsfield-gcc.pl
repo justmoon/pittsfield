@@ -32,6 +32,7 @@ my @c_opt = ("-O3");
 my @cxx_opt = ("-O3", "-fno-exceptions", "-fno-rtti");
 my $gcc = "gcc";
 my $gxx = "g++";
+my $arch = "i386";
 
 my $vx32_dir = "<not_supported>";
 my $vx32_libc_inc = "$vx32_dir/cinc";
@@ -161,7 +162,7 @@ if ($no_sfi or $jump_only) {
 
 sub assemble_file {
     my($s_file, $o_file) = @_;
-    verbose_command($as, $s_file, "-o", $o_file);
+    verbose_command($as, "--32", "-march=" . $arch, $s_file, "-o", $o_file);
 }
 
 sub compile_file {
@@ -171,8 +172,11 @@ sub compile_file {
     $basename =~ s[^.*/][];
     $basename =~ s/\..*$//;
     my $temp_file = "$temp_dir/sfigcc-$basename$$";
+    push @args, "-m32";
+    push @args, "-march=" . $arch;
     if (!$pad_only) {
 	push @args, "-nostdinc";
+        push @args, "-fno-builtin";
 	if ($vx32) {
 	    push @args, "-I$vx32_libc_inc";
 	} else {
@@ -298,7 +302,7 @@ if ($minus_c and @c_files) {
 	    @start_objs = ($libc_mo);
 	}
 
-	verbose_command($ld, "-o", $fio_file, @start_objs, @ld_args, @args);
+	verbose_command($ld, "-m", "elf_i386", "-o", $fio_file, @start_objs, @ld_args, @args);
 	if (!$no_sfi and !$jump_only) {
 	    verbose_redir_command($objdump, "-dr", $fio_file, ">$dis_file");
 	    open(CHECKS, "-|", $perl, "-I$pittsfield_dir", $verify,
